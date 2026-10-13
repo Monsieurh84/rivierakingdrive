@@ -76,6 +76,23 @@ h1,h2,h3{font-family:var(--f-display);font-weight:400;letter-spacing:.04em;text-
 .hd .btn{padding:13px 22px}
 @media (max-width:1080px){.hd nav{display:none}.hd .wrap{grid-template-columns:auto 1fr}.hd .brand{align-items:flex-start}}
 @media (max-width:640px){.hd .phone,.hd .btn{display:none}}
+/* Menu mobile */
+.burger{display:none;position:relative;width:46px;height:46px;border:1px solid var(--line);background:transparent;cursor:pointer;padding:0;flex:none}
+.burger span{position:absolute;left:12px;right:12px;height:1px;background:var(--gold-hi);transition:transform .5s var(--ease),top .5s var(--ease)}
+.burger span:first-child{top:18px}.burger span:last-child{top:27px}
+.burger[aria-expanded="true"] span:first-child{top:22px;transform:rotate(45deg)}
+.burger[aria-expanded="true"] span:last-child{top:22px;transform:rotate(-45deg)}
+@media (max-width:1080px){.burger{display:block}}
+.mnav{position:fixed;inset:0;z-index:45;background:radial-gradient(70% 50% at 50% 100%,rgba(212,175,95,.12),transparent 70%),var(--ink);padding:calc(110px + env(safe-area-inset-top,0px)) clamp(20px,6vw,56px) calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;overflow-y:auto}
+.mnav nav{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.mnav nav a{display:flex;justify-content:space-between;align-items:center;padding:22px 0;border-bottom:1px solid var(--line);font-family:var(--f-display);font-size:clamp(24px,7vw,34px);letter-spacing:.06em;text-decoration:none;color:var(--ivory)}
+.mnav nav a::after{content:"→";font-family:var(--f-body);font-size:18px;color:var(--gold)}
+html.menu-open .mbar{display:none}
+.mnav .foot-m{margin-top:auto;padding-top:36px;display:grid;gap:12px}
+.mnav .foot-m small{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.mnav .foot-m .tel{font-family:var(--f-display);font-size:26px;letter-spacing:.06em;text-decoration:none;color:var(--gold-hi)}
+.mnav .foot-m .btn{margin-top:10px}
+@media (prefers-reduced-motion:no-preference){.mnav:not([hidden]) nav a{animation:navin .7s var(--ease) both}.mnav nav a:nth-child(2){animation-delay:.05s}.mnav nav a:nth-child(3){animation-delay:.1s}.mnav nav a:nth-child(4){animation-delay:.15s}.mnav nav a:nth-child(5){animation-delay:.2s}@keyframes navin{from{transform:translateY(16px)}to{transform:none}}}
 
 /* ---------- Hero ---------- */
 .hero{position:relative;min-height:max(720px,100svh);display:grid;grid-template-rows:1fr auto;overflow:hidden;isolation:isolate;padding-top:88px}
@@ -261,9 +278,21 @@ footer{border-top:1px solid var(--line);padding-block:80px 40px;background:#0505
   <div class="right">
    <a class="phone" href="tel:+33759039008"><small>7 j / 7 · 24 h / 24</small>07 59 03 90 08</a>
    <a class="btn btn-ghost" href="#reserver"><span>Réserver</span></a>
+   <button class="burger" id="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="mnav"><span></span><span></span></button>
   </div>
  </div>
 </header>
+
+<div class="mnav" id="mnav" hidden>
+ <nav aria-label="Menu mobile">
+  <a href="#services">Services</a><a href="#vehicule">Le Classe V</a><a href="#tarifs">Tarifs</a><a href="#reserver">Estimer &amp; réserver</a><a href="#faq">Questions</a>
+ </nav>
+ <div class="foot-m">
+  <small>7 j / 7 · 24 h / 24</small>
+  <a class="tel" href="tel:+33759039008">07 59 03 90 08</a>
+  <a class="btn btn-solid" href="https://wa.me/33759039008" target="_blank" rel="noopener"><span>Écrire sur WhatsApp</span></a>
+ </div>
+</div>
 
 <main id="top">
 <section class="hero" style="padding-bottom:0" aria-label="Accueil">
@@ -510,6 +539,14 @@ footer{border-top:1px solid var(--line);padding-block:80px 40px;background:#0505
  var hd=document.getElementById('hd');
  function onScroll(){hd.classList.toggle('solid',scrollY>30)}
  addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+ // Menu mobile
+ var bg=document.getElementById('burger'),mn=document.getElementById('mnav');
+ function setMenu(open){mn.hidden=!open;bg.setAttribute('aria-expanded',open);bg.setAttribute('aria-label',open?'Fermer le menu':'Ouvrir le menu');document.documentElement.style.overflow=open?'hidden':'';document.documentElement.classList.toggle('menu-open',open);hd.classList.toggle('solid',open||scrollY>30)}
+ bg.addEventListener('click',function(){setMenu(mn.hidden)});
+ mn.addEventListener('click',function(e){if(e.target.closest('a'))setMenu(false)});
+ addEventListener('keydown',function(e){if(e.key==='Escape'&&!mn.hidden){setMenu(false);bg.focus()}});
+ matchMedia('(min-width:1081px)').addEventListener('change',function(m){if(m.matches)setMenu(false)});
 
  // Parallaxe douce du van
  var car=document.getElementById('car');
